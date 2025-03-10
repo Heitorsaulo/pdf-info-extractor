@@ -6,6 +6,7 @@ import json
 from openpyxl import Workbook
 import io
 from API_info import ApiInfo
+import pandas as pd
 
 api_info = ApiInfo()
 
@@ -31,6 +32,61 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> str:
     text = "\n".join(page.get_text("text") for page in doc)
     return text.strip()
 
+def add_summary_to_table(summary: str, table: pd.DataFrame) -> pd.DataFrame:
+    summary_row = pd.DataFrame([{"Ponto Chave": "Resumo", "Valor": summary}])
+    table_with_summary = pd.concat([summary_row, table], ignore_index=True)
+    return table_with_summary
+
+def modify_save_table(table: pd.DataFrame, output_path: str):
+    with pd.ExcelWriter(output_path, engine='xlsxwriter') as writer:
+        table.to_excel(writer, index=False, sheet_name='Análise de Dados')
+
+        workbook = writer.book
+        worksheet = writer.sheets['Análise de Dados']
+
+        # Set the column width and format
+        for column in table:
+            column_width = max(table[column].astype(str).map(len).max(), len(column))
+            col_idx = table.columns.get_loc(column)
+            worksheet.set_column(col_idx, col_idx, column_width)
+
+        # Add a header format
+        header_format = workbook.add_format({
+            'bold': True,
+            'text_wrap': True,
+            'valign': 'top',
+            'fg_color': '#D7E4BC',
+            'border': 1
+        })
+
+        # Write the column headers with the defined format
+        for col_num, value in enumerate(table.columns.values):
+            worksheet.write(0, col_num, value, header_format)
+
+        # Add a format for the summary row
+        summary_format = workbook.add_format({
+            'bold': True,
+            'text_wrap': True,
+            'valign': 'top',
+            'fg_color': '#FFEB9C',
+            'border': 1
+        })
+
+        # Apply the summary format
+        for col_num in range(len(table.columns)):
+            worksheet.write(1, col_num, table.iloc[0, col_num], summary_format)
+
+        # Apply the general format
+        general_format = workbook.add_format({
+            'text_wrap': True,
+            'valign': 'top',
+            'border': 1
+        })
+
+        for row_num in range(1, len(table)):
+            print(row_num)
+            for col_num in range(len(table.columns)):
+                worksheet.write(row_num+1, col_num, table.iloc[row_num, col_num], general_format)
 
 def get_relevant_info_from_openai(text: str) -> str:
     prompt = f"""   
@@ -62,7 +118,7 @@ def get_relevant_info_from_openai(text: str) -> str:
     return extracted_data
 
 
-def create_excel_from_analysis(json_data: str) -> bytes:
+def create_excel_from_analysis(json_data: str) -> str:
     prompt = f"""
     Você é um assistente inteligente especializado em criar tabelas no Excel.
     Analise o seguinte JSON com informações chave e resumo, e crie um JSON que será tratado e transformado em uma tabela excel.
@@ -102,23 +158,11 @@ def create_excel_from_analysis(json_data: str) -> bytes:
     except json.JSONDecodeError as e:
         raise ValueError(f"Invalid JSON response: {e}")
 
-    data = response_json.get("data", [])
-
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Análise de Dados"
-
-    if data:
-        headers = list(data[0].keys())
-        ws.append(headers)
-
-        for row in data:
-            ws.append(list(row.values()))
-
-    excel_file = io.BytesIO()
-    wb.save(excel_file)
-    excel_file.seek(0)
-
-    return excel_file.read()
+    table = pd.DataFrame(response_json.get("data", []))
+    relevant_info_json = json.loads(json_data)
+    table_with_summary = add_summary_to_table(relevant_info_json['summary'], table)
+    output_path = "static/output.xlsx"
+    modify_save_table(table_with_summary, output_path)
+    return output_path
 
 

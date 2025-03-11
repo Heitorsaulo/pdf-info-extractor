@@ -7,6 +7,7 @@ from openpyxl import Workbook
 import io
 from API_info import ApiInfo
 import pandas as pd
+import re
 
 api_info = ApiInfo()
 
@@ -116,6 +117,55 @@ def get_relevant_info_from_openai(text: str) -> str:
     extracted_data = response.choices[0].message.content
     print(extracted_data)
     return extracted_data
+
+
+def create_markdown_from_analysis(json_data: str) -> None:
+    prompt = f"""
+    Você é um assistente especializado na criação de documentos Markdown estruturados.
+    Analise o seguinte JSON contendo um resumo e pontos-chave e converta-o em um documento Markdown bem organizado.
+   
+    Certifique-se de:
+    - Usar corretamente a sintaxe Markdown para formatação
+    - Manter a hierarquia das informações com cabeçalhos adequados (#, ##, ###)
+    - Utilizar listas com marcadores (-) para os pontos-chave
+    - Usar **negrito** para destacar títulos importantes
+    - Preservar parágrafos com quebras de linha adequadas
+    - Manter blocos de código, tabelas ou outras estruturas que possam estar presentes no conteúdo
+   
+    JSON de entrada:
+    {json_data}
+   
+    Retorne APENAS o conteúdo Markdown finalizado, sem comentários adicionais ou explicações.
+    Comece o documento com:
+   
+    # Resumo
+    
+    Seguido pelo conteúdo do resumo, e então:
+    
+    ## Pontos-Chave
+    
+    Seguido pelos pontos-chave formatados adequadamente.
+    """
+    
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "system", "content": prompt}],
+        max_tokens=5000,
+    )
+    
+    markdown_content = response.choices[0].message.content
+
+    if not markdown_content:
+        raise ValueError("Resposta vazia da API OpenAI")
+   
+    markdown_content = re.sub(r'\n{3,}', '\n\n', markdown_content.strip())
+
+    outputh_path = 'static/output.md'
+    with open(outputh_path, "w", encoding="utf-8") as file:
+        file.write(markdown_content)
+
+    
+    return outputh_path
 
 
 def create_excel_from_analysis(json_data: str) -> str:

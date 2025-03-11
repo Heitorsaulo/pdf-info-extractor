@@ -2,7 +2,7 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from extractor import extract_text_from_pdf, get_relevant_info_from_openai, create_excel_from_analysis
+from extractor import extract_text_from_pdf, get_relevant_info_from_openai, create_excel_from_analysis, create_markdown_from_analysis
 import os
 import json
 
@@ -29,6 +29,7 @@ async def extract_info(file: UploadFile = File(...)):
 
     extracted_info_json = get_relevant_info_from_openai(text)
     excel_file_path = create_excel_from_analysis(extracted_info_json)
+    markdown_content = create_markdown_from_analysis(extracted_info_json)
 
     extracted_info = json.loads(extracted_info_json)
     summary = extracted_info.get("summary", "")
@@ -37,12 +38,17 @@ async def extract_info(file: UploadFile = File(...)):
     return {
         "summary": summary,
         "key_points": key_points,
-        "excel_file": excel_file_path
+        "excel_file": excel_file_path,
+        "markdown_file": markdown_content
     }
 
 @app.get("/download_excel")
 async def download_excel(file_path: str):
     return FileResponse(file_path, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', filename="output.xlsx")
+
+@app.get("/download_markdown")
+async def download_markdown(file_path: str):
+    return FileResponse(file_path, media_type='text/markdown', filename="output.md")
 
 if __name__ == "__main__":
     import uvicorn

@@ -7,21 +7,12 @@ from openpyxl import Workbook
 import io
 from API_info import ApiInfo
 import pandas as pd
+from llm_caller import generateResponseLLM
 import re
 
-api_info = ApiInfo()
-
-org, project = api_info.get_info()
-
-client = openai.OpenAI(
-    organization=org,
-    project=project,
-    api_key=os.environ.get('MY_OPENAI_KEY')
-)
 
 # Configurar a chave da OpenAI (pode ser via variável de ambiente)
 OPENAI_API_KEY = os.getenv("MY_OPENAI_KEY")
-
 
 class ExtractedData(BaseModel):
     summary: str
@@ -107,17 +98,13 @@ def get_relevant_info_from_openai(text: str) -> str:
         "key_points": ["<ponto 1>", "<ponto 2>", "<ponto 3>", ...]
     }}
     """
-
-    response = client.chat.completions.create(
+    extracted_data = generateResponseLLM(
         model="gpt-4o-mini",
         messages=[{"role": "system", "content": prompt}],
         max_tokens=5000,
     )
 
-    extracted_data = response.choices[0].message.content
-    print(extracted_data)
     return extracted_data
-
 
 def create_markdown_from_analysis(json_data: str) -> None:
     prompt = f"""
@@ -147,13 +134,11 @@ def create_markdown_from_analysis(json_data: str) -> None:
     Seguido pelos pontos-chave formatados adequadamente.
     """
     
-    response = client.chat.completions.create(
+    markdown_content = generateResponseLLM(
         model="gpt-4o-mini",
         messages=[{"role": "system", "content": prompt}],
         max_tokens=5000,
     )
-    
-    markdown_content = response.choices[0].message.content
 
     if not markdown_content:
         raise ValueError("Resposta vazia da API OpenAI")
@@ -189,16 +174,11 @@ def create_excel_from_analysis(json_data: str) -> str:
         }}
     """
 
-    response = client.chat.completions.create(
+    response_content = generateResponseLLM(
         model="gpt-4o-mini",
         messages=[{"role": "system", "content": prompt}],
         max_tokens=5000,
     )
-
-    response_content = response.choices[0].message.content
-
-    print(response_content)
-
 
     if not response_content:
         raise ValueError("Empty response from OpenAI API")

@@ -41,7 +41,12 @@ This project is a FastAPI-based application that extracts text from PDF files, p
     uvicorn main:app --reload
     ```
 
-5. Open your browser and navigate to `http://localhost:8000` to use the web interface.
+5. Run the client:
+    ```sh
+        streamlit run .\pdf_extractor.py
+    ```
+
+6. Open your browser and navigate to `http://localhost:8501` to use the web interface.
 
 ### License
 

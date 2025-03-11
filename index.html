@@ -66,10 +66,12 @@
                 const formData = new FormData();
                 formData.append('file', file);
 
-                // Send to FastAPI backend
                 const response = await fetch('http://localhost:8000/extract_pdf', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
 
                 if (!response.ok) {
@@ -78,7 +80,6 @@
 
                 const result = await response.json();
 
-                // Populate results
                 document.getElementById('resultTitle').textContent = 'Extracted Information';
                 summaryText.textContent = result.summary;
 
@@ -88,7 +89,6 @@
                     keyPointsList.appendChild(li);
                 });
 
-                // Show download link
                 downloadLink.href = `http://localhost:8000/download_excel?file_path=${result.excel_file}`;
                 resultContainer.classList.remove('hidden');
                 loadingSpinner.classList.add('hidden');

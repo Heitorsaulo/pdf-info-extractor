@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import base64
 import json
+import os
 
 st.set_page_config(
     page_title="Insight Extractor",
@@ -15,12 +16,15 @@ if "extracted_data" not in st.session_state:
     st.session_state.extracted_data = None
 if "excel_bytes" not in st.session_state:
     st.session_state.excel_bytes = None
+if "md_content" not in st.session_state:
+    st.session_state.md_content = None
 if "previous_file" not in st.session_state:
     st.session_state.previous_file = None
 
 def clear_state():
     st.session_state.extracted_data = None
     st.session_state.excel_bytes = None
+    st.session_state.md_content = None
     st.session_state.previous_file = None
     st.rerun()
 
@@ -46,16 +50,24 @@ def process_pdf(uploaded_file):
                 "key_points": result["key_points"]
             }
             
+            # Baixar o arquivo Excel e armazená-lo como bytes
             excel_response = requests.get(f"http://localhost:8000/download_excel?file_path={result['excel_file']}")
             excel_response.raise_for_status()
             st.session_state.excel_bytes = excel_response.content
             
-            st.success("✅ Dados extraidos com sucesso!")
+            md_response = requests.get(
+                f"http://localhost:8000/download_excel?file_path={result['markdown_file']}", 
+                json={"summary": result["summary"], "key_points": result["key_points"]}
+            )
+            md_response.raise_for_status()
+            st.session_state.md_content = md_response.content
+            
+            st.success("✅ Dados extraídos com sucesso!")
             
         except requests.exceptions.RequestException as e:
             st.error(f"❌ Erro ao processar arquivo: {e}")
 
-# File upload area with custom styling
+# Área de upload de arquivos com estilo personalizado
 st.markdown("""
 <style>
 div.stFileUploader > div:first-child {
@@ -74,6 +86,7 @@ uploaded_file = st.file_uploader(
     help="Apenas arquivos PDF são permitidos"
 )
 
+# Se o arquivo anterior não for o mesmo, limpar o estado
 if st.session_state.previous_file is not None and uploaded_file is None:
     clear_state()
 
@@ -83,25 +96,33 @@ if uploaded_file is not None:
     if st.button("Extrair Informações"):
         process_pdf(uploaded_file)
 
-# Display extracted information
+# Exibir as informações extraídas
 if st.session_state.extracted_data:
     st.subheader("ℹ️ Informações Extraídas")
-    
-    # Display key points
+
+    # Exibir pontos-chave
     st.markdown("### Key Points")
     for point in st.session_state.extracted_data["key_points"]:
         st.markdown(f"• {point}")
     
-    # Display summary
+    # Exibir resumo
     st.markdown("### Summary")
     st.write(st.session_state.extracted_data["summary"])
     
-    # Download button for Excel file
     if st.session_state.excel_bytes:
         st.download_button(
             label="📥 Download Excel",
             data=st.session_state.excel_bytes,
             file_name="output.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            help="Click to download the extracted data as Excel file"
+            help="Clique para baixar o arquivo Excel com os dados extraídos"
+        )
+    
+    if st.session_state.md_content:
+        st.download_button(
+            label="📥 Download Markdown",
+            data=st.session_state.md_content,
+            file_name="output.md",
+            mime="text/markdown",
+            help="Clique para baixar o arquivo Markdown com os dados extraídos"
         )

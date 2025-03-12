@@ -20,7 +20,7 @@ This project is a FastAPI-based application that extracts text from PDF files, p
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/Heitorsaulo/pdf-info-extractor.git
+    https://github.com/Heitorsaulo/pdf-info-extractor.git
     cd pdf-info-extractor
     ```
 

@@ -14,7 +14,6 @@ This project is a FastAPI-based application that extracts text from PDF files, p
 - **FastAPI**: For building the backend API.
 - **OpenAI API**: For processing and extracting information from the text.
 - **Pandas**: For creating and formatting Excel files.
-- **Tailwind CSS**: For styling the web interface.
 
 ### Getting Started
 

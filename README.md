@@ -22,29 +22,33 @@ This project is a FastAPI-based application that extracts text from PDF files, p
     git clone https://github.com/Heitorsaulo/pdf-info-extractor.git
     cd pdf-info-extractor
     ```
-2. Configure your organization and project in the API_info.py file
+2. Enter the project folder
+   ```
+   cd pdf-info-extractor
+   ```
+3. Configure your organization and project in the API_info.py file
    - Open the API_info.py file and set the values of self.organization and self.project with your account information
 
-3. Create a virtual environment and install dependencies:
+4. Create a virtual environment and install dependencies:
     ```sh
     python -m venv .venv
     source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
     pip install -r requirements.txt
     ```
 
-4. Set up your OpenAI API key:
+5. Set up your OpenAI API key:
     ```sh
     export MY_OPENAI_KEY='your-openai-api-key'  # On Windows use `set MY_OPENAI_KEY=your-openai-api-key`
     ```
 
-5. Run the application:
+6. Run the application:
     ```sh
     uvicorn main:app --reload
     ```
 
-6. Run the client:
+7. Run the client:
     ```sh
     streamlit run .\pdf_extractor.py
     ```
 
-7. Open your browser and navigate to `http://localhost:8501` to use the web interface.
+8. Open your browser and navigate to `http://localhost:8501` to use the web interface.

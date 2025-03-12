@@ -47,7 +47,3 @@ This project is a FastAPI-based application that extracts text from PDF files, p
     ```
 
 6. Open your browser and navigate to `http://localhost:8501` to use the web interface.
-
-### License
-
-This project is licensed under the MIT License. See the `LICENSE` file for more details.

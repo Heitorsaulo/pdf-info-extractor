@@ -1,53 +1,53 @@
-## PDF Information Extractor
+## Insight Extractor
 
-This project is a FastAPI-based application that extracts text from PDF files, processes the text using OpenAI's API to extract relevant information, and generates an Excel file with the extracted data. The application includes a web interface for uploading PDF files and viewing the extracted information.
+Este projeto é uma aplicação baseada em FastAPI que extrai texto de arquivos PDF, processa o texto usando a API da OpenAI para extrair informações relevantes e gera um arquivo Excel com os dados extraídos. A aplicação inclui uma interface web para upload de arquivos PDF e visualização das informações extraídas.
 
-### Features
+### Funcionalidades
 
-- **PDF Text Extraction**: Extracts text from uploaded PDF files.
-- **Information Extraction**: Uses OpenAI's API to analyze the text and extract key points and summaries.
-- **Excel Generation**: Creates an Excel file with the extracted information.
-- **Web Interface**: Provides a user-friendly interface for uploading PDFs and viewing results.
+- **Extração de Texto de PDF**: Extrai o texto de arquivos PDF enviados.
+- **Extração de Informações**: Usa a API da OpenAI para analisar o texto e extrair pontos-chave e resumos.
+- **Geração de Excel**: Cria um arquivo Excel com as informações extraídas.
+- **Interface Web**: Oferece uma interface amigável para upload de PDFs e visualização dos resultados.
 
-### Technologies Used
+### Tecnologias Utilizadas
 
-- **FastAPI**: For building the backend API.
-- **OpenAI API**: For processing and extracting information from the text.
-- **Pandas**: For creating and formatting Excel files.
+- **FastAPI**: Para construir a API do backend..
+- **OpenAI API**: Para processar e extrair informações do texto.
+- **Pandas**: Para criar e formatar arquivos Excel.
 
-### Getting Started
+### Como Utilizar
 
-1. Clone the repository:
+1. Clone o repositório:
     ```sh
     git clone https://github.com/Heitorsaulo/pdf-info-extractor.git
     ```
-2. Enter the project folder
+2. Acesse a pasta do projetor
    ```
    cd pdf-info-extractor
    ```
-3. Configure your organization and project in the API_info.py file
-   - Open the API_info.py file and set the values of self.organization and self.project with your account information
+3. Configure sua organização e projeto no arquivo `API_info.py`
+   - Abra o arquivo API_info.py e defina os valores de self.organization e self.project com as informações da sua conta.
 
-4. Create a virtual environment and install dependencies:
+4. Crie um ambiente virtual e instale as dependências:
     ```sh
     python -m venv .venv
-    source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
+    source .venv/bin/activate # No Windows use `.venv\Scripts\activate`
     pip install -r requirements.txt
     ```
 
-5. Set up your OpenAI API key:
+5. Configure sua chave da API OpenAI:
     ```sh
-    export MY_OPENAI_KEY='your-openai-api-key'  # On Windows use `set MY_OPENAI_KEY=your-openai-api-key`
+    export MY_OPENAI_KEY='your-openai-api-key'  # No Windows use `set MY_OPENAI_KEY=sua-chave-openai`
     ```
 
-6. Run the application:
+6. Execute a aplicação:
     ```sh
     uvicorn main:app --reload
     ```
 
-7. Run the client:
+7. Execute o cliente:
     ```sh
     streamlit run .\pdf_extractor.py
     ```
 
-8. Open your browser and navigate to `http://localhost:8501` to use the web interface.
+8. Abra seu navegador e acesse `http://localhost:8501` para usar a interface web.

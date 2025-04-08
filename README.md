@@ -2,6 +2,11 @@
 
 Este projeto é uma aplicação baseada em FastAPI que extrai texto de arquivos PDF, processa o texto usando a API da OpenAI para extrair informações relevantes e gera um arquivo Excel com os dados extraídos. A aplicação inclui uma interface web para upload de arquivos PDF e visualização das informações extraídas.
 
+### Integrantes da Equipe:
+ - **Filipe Rodrigues Santana**
+ - **Heitor Saulo Dantas Santos**
+ - **Itor Carlos Souza Queiroz**
+
 ### Funcionalidades
 
 - **Extração de Texto de PDF**: Extrai o texto de arquivos PDF enviados.
